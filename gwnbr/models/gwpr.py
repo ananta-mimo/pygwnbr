@@ -149,3 +149,12 @@ class GWPR(GWRBase):
                   f"Pseudo-R2={self.pct_deviance:.4f}")
 
         return self
+    
+    def significant_betas(self, alpha_level: float = 0.05) -> np.ndarray:
+        """
+        Significance mask using standard p-value cutoff.
+        No multiple-testing correction for GWPR (alpha not estimated).
+        """
+        if not self._fitted:
+            raise RuntimeError("Call fit() first.")
+        return self.p_values < alpha_level

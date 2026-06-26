@@ -54,7 +54,7 @@ GEOID | y_obs | y_hat | alpha | beta_income | se_income | t_income | p_income | 
 ## Installation
 
 ```bash
-git clone https://github.com/ananta-mimo/pygwnbr
+git clone https://github.com/ananta-mimo/gwnbr
 cd gwnbr
 pip install -e ".[viz]"
 ```
@@ -182,7 +182,7 @@ Statistics and Computing, 24, 769–783.
 **This package:**
 ```
 Sinha, A. and Mathew, S. (2026). gwnbr: Geographically Weighted Negative Binomial Regression in Python.
-https://github.com/ananta-mimo/pygwnbr
+https://github.com/ananta-mimo/gwnbr
 ```
 
 ---

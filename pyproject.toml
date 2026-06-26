@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"  
 
 [project]
 name = "gwnbr"
@@ -59,10 +59,10 @@ dev = [
 all = ["gwnbr[viz,dev]"]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/gwnbr"
-Repository = "https://github.com/yourusername/gwnbr"
-Documentation = "https://gwnbr.readthedocs.io"
-"Bug Tracker" = "https://github.com/yourusername/gwnbr/issues"
+Homepage      = "https://github.com/ananta-mimo/gwnbr"
+Repository    = "https://github.com/ananta-mimo/gwnbr"
+Documentation = "https://github.com/ananta-mimo/gwnbr/blob/main/THEORY.md"
+"Bug Tracker" = "https://github.com/ananta-mimo/gwnbr/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]

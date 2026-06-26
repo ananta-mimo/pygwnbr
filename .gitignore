@@ -58,5 +58,5 @@ docs/site/
 .env
 
 example_test/
-# run_example.py
+run_example.py
 results_synthetic.csv

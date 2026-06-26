@@ -159,6 +159,8 @@ for ModelClass, name, bw in [
 | GEOID | string | Tract identifier for joining results back to shapefile. |
 
 ---
+For raw crash point data, use `geopandas` for spatial joining and 
+aggregation to tracts, and `cenpy` or `pygris` for fetching ACS variables.
 
 ## Theory and methodology
 

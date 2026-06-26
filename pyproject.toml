@@ -61,7 +61,7 @@ all = ["gwnbr[viz,dev]"]
 [project.urls]
 Homepage      = "https://github.com/ananta-mimo/gwnbr"
 Repository    = "https://github.com/ananta-mimo/gwnbr"
-Documentation = "https://github.com/ananta-mimo/gwnbr/blob/main/THEORY.md"
+Documentation = "https://github.com/ananta-mimo/gwnbr/blob/main/docs/THEORY.md"
 "Bug Tracker" = "https://github.com/ananta-mimo/gwnbr/issues"
 
 [tool.setuptools.packages.find]

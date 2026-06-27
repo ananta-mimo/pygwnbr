@@ -206,8 +206,12 @@ class GWNBRg(GWRBase):
         if verbose:
             print("[GWNBRg] Estimating global alpha via NB regression...")
 
-        alpha_g, beta_g, _ = _fit_global_nb(self.X, self.y, self.offset)
+        # alpha_g, beta_g, _ = _fit_global_nb(self.X, self.y, self.offset)
+        # self.alpha_global = alpha_g
+
+        alpha_g, beta_g, _ = _fit_global_nb(self.X, self.y, self.offset) ##  store global beta
         self.alpha_global = alpha_g
+        self.beta_global  = beta_g
 
         if verbose:
             print(f"[GWNBRg] Global alpha = {alpha_g:.6f}  "

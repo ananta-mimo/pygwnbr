@@ -160,6 +160,73 @@ class GWRBase(ABC):
         lines.append("=" * 62)
         return "\n".join(lines)
 
+    def coefficient_summary(self) -> pd.DataFrame:
+        """
+        Return a DataFrame of local coefficient distribution statistics.
+
+        Columns: Variable, Min, P25, Mean, Median, P75, Max, IQR, Std.
+
+        Mirrors the quantile output table in the SAS %gwnbr macro
+        (Silva & Rodrigues, 2014). Useful for comparing mean local
+        coefficients against a global NB model (see GWNBRg.beta_global).
+
+        Returns
+        -------
+        pd.DataFrame, shape (p, 9)
+        """
+        if not self._fitted:
+            raise RuntimeError("Call fit() first.")
+
+        rows = []
+        for j, name in enumerate(self.var_names):
+            b = self.betas[:, j]
+            rows.append({
+                "Variable": name,
+                "Min":      round(float(np.min(b)),              4),
+                "P25":      round(float(np.percentile(b, 25)),   4),
+                "Mean":     round(float(np.mean(b)),             4),
+                "Median":   round(float(np.median(b)),           4),
+                "P75":      round(float(np.percentile(b, 75)),   4),
+                "Max":      round(float(np.max(b)),              4),
+                "IQR":      round(float(np.percentile(b, 75)
+                                   - np.percentile(b, 25)),      4),
+                "Std":      round(float(np.std(b)),              4),
+            })
+        return pd.DataFrame(rows)
+
+    def local_r2(self) -> np.ndarray:
+        """
+        Local pseudo-R2 per tract.
+
+        Uses the proportion of fitted value deviation from global mean,
+        which is more numerically stable than single-observation deviance.
+
+            r2_i = 1 - (y_i - yhat_i)^2 / (y_i - mean(y))^2
+
+        This is analogous to local R2 in standard GWR (Fotheringham et al. 2002)
+        and avoids numerical instability from single-point NB deviance.
+        """
+        if not self._fitted:
+            raise RuntimeError("Call fit() first.")
+
+        mu_null  = float(np.mean(self.y))
+        residuals = self.y - self.y_hat
+        null_dev  = self.y - mu_null
+
+        # Avoid division by zero for tracts where y_i == mean(y)
+        denom = null_dev ** 2
+        denom = np.where(denom < 1e-10, np.nan, denom)
+
+        r2_local = 1.0 - (residuals ** 2) / denom
+
+        # Clip to [-1, 1] — extreme values indicate outlier tracts
+        r2_local = np.clip(r2_local, -1.0, 1.0)
+
+        # Replace nan (tracts at exact mean) with 0
+        r2_local = np.where(np.isnan(r2_local), 0.0, r2_local)
+
+        return r2_local
+
     def to_dataframe(self) -> pd.DataFrame:
         """
         Export results as a tidy DataFrame.

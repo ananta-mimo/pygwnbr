@@ -39,7 +39,7 @@ from gwnbr.models.gwpr import GWPR
 from gwnbr.stationarity import StationarityTest
 
 __version__ = "0.1.0"
-__author__ = "Ananta Sinha"
+__author__ = "Ananta Sinha, Sonu Mathew"
 __license__ = "MIT"
 
 __all__ = ["GWNBR", "GWNBRg", "GWPR", "StationarityTest"]

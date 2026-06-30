@@ -36,7 +36,7 @@ coverage.xml
 Thumbs.db
 
 # Data files (keep sample data in docs/ only)
-*.csv
+# *.csv
 *.shp
 *.dbf
 *.shx

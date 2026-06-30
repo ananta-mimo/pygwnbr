@@ -181,10 +181,11 @@ Statistics and Computing, 24, 769–783.
 
 **This package:**
 ```
-Sinha, A. and Mathew, S. (2026). gwnbr: Geographically Weighted Negative Binomial Regression in Python.
-https://github.com/ananta-mimo/gwnbr
+Sinha, A. and Mathew, S. (2026). gwnbr: Geographically Weighted 
+Negative Binomial Regression in Python (v0.1.0). Zenodo.
+https://doi.org/10.5281/zenodo.21041972
 ```
-
+https://github.com/ananta-mimo/gwnbr
 ---
 
 ## License

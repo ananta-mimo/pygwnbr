@@ -166,6 +166,7 @@ class GWNBRg(GWRBase):
     def __init__(self, coords, y, X, offset=None, variable_names=None):
         super().__init__(coords, y, X, offset, variable_names)
         self.alpha_global = None   # set after fit()
+        self._alpha_override = None   # used internally by StationarityTest
 
     def fit(self,
             bandwidth: float,
@@ -203,15 +204,26 @@ class GWNBRg(GWRBase):
 
         D = pairwise_distances(self.coords)    # (n, n)
 
-        if verbose:
-            print("[GWNBRg] Estimating global alpha via NB regression...")
+        if self._alpha_override is not None:
+            # Used by StationarityTest — skip global re-estimation so
+            # permutation fits isolate spatial variation in beta only,
+            # following the %estac SAS macro (Silva & Rodrigues, 2014).
+            alpha_g = self._alpha_override
+            # Need a beta_g starting point; quick global IRLS at fixed alpha
+            from gwnbr.utils.irls_solver import irls
+            ones = np.ones(self.n)
+            beta_g, _, _, _ = irls(self.X, self.y, ones, self.offset,
+                                    alpha=alpha_g, max_iter=max_irls,
+                                    tol=tol_irls)
+            if verbose:
+                print(f"[GWNBRg] Using fixed alpha = {alpha_g:.6f} "
+                      f"(stationarity test mode)")
+        else:
+            if verbose:
+                print("[GWNBRg] Estimating global alpha via NB regression...")
+            alpha_g, beta_g, _ = _fit_global_nb(self.X, self.y, self.offset)
 
-        # alpha_g, beta_g, _ = _fit_global_nb(self.X, self.y, self.offset)
-        # self.alpha_global = alpha_g
-
-        alpha_g, beta_g, _ = _fit_global_nb(self.X, self.y, self.offset) ##  store global beta
         self.alpha_global = alpha_g
-        self.beta_global  = beta_g
 
         if verbose:
             print(f"[GWNBRg] Global alpha = {alpha_g:.6f}  "

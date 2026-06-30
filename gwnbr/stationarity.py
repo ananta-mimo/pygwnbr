@@ -74,6 +74,7 @@ def _fit_permuted(
     bandwidth: float,
     kernel: str,
     fit_kwargs: dict,
+    fixed_alpha: float = None,
 ) -> np.ndarray:
     """
     Fit model on permuted y and return Vk statistics.
@@ -83,12 +84,23 @@ def _fit_permuted(
     model_class : class   One of GWNBRg, GWNBR, GWPR.
     y_perm      : np.ndarray  Permuted response variable.
     X, coords, offset, bandwidth, kernel, fit_kwargs : as in main model.
+    fixed_alpha : float or None
+        If provided and model_class is GWNBRg, holds alpha fixed at
+        this value instead of re-estimating it from permuted data.
+        This isolates the test to spatial variation in beta only,
+        following the %estac SAS macro (Silva & Rodrigues, 2014).
+        Re-estimating alpha on permuted data adds unrelated noise
+        from the permutation's altered dispersion structure, which
+        biases the permutation distribution and can mask genuine
+        spatial non-stationarity in beta.
 
     Returns
     -------
     vk_perm : np.ndarray, shape (p,)
     """
     model = model_class(coords, y_perm, X, offset=offset)
+    if fixed_alpha is not None and hasattr(model, "_alpha_override"):
+        model._alpha_override = fixed_alpha
     model.fit(bandwidth=bandwidth, kernel=kernel,
               verbose=False, **fit_kwargs)
     return _compute_vk(model.betas)
@@ -161,10 +173,17 @@ class StationarityTest:
 
         # Determine fit kwargs based on model type
         self._fit_kwargs = {}
-        if hasattr(model, "alpha_global"):
-            # GWNBRg — pass global alpha to speed up permutation fits
-            pass   # standard fit, alpha re-estimated each time
         self._fit_kwargs["n_jobs"] = 1   # inner parallelism off during perms
+
+        # Capture alpha from the REAL fitted model so permutation fits
+        # hold it fixed — isolates the test to spatial variation in
+        # beta only, matching the %estac SAS macro behaviour.
+        if hasattr(model, "alpha_global") and model.alpha_global is not None:
+            self._fixed_alpha = model.alpha_global
+        elif model.alphas is not None:
+            self._fixed_alpha = float(np.mean(model.alphas))
+        else:
+            self._fixed_alpha = None
 
         # Results (set after run())
         self.vk_observed  = None
@@ -210,6 +229,7 @@ class StationarityTest:
                 self._bandwidth,
                 self._kernel,
                 self._fit_kwargs,
+                self._fixed_alpha,
             )
             for i, y_perm in enumerate(permuted_ys)
         )
